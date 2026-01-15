@@ -1,0 +1,50 @@
+{
+  "success": true,
+  "message": "처리 완료 (1개 상품 추천, 18593ms)",
+  "total_time_ms": 18627.71725654602,
+  "test_circle": {
+    "x": 0.3,
+    "y": 0.7,
+    "radius": 0.1
+  },
+  "circle_info": {
+    "center_x": 270,
+    "center_y": 186,
+    "radius": 90,
+    "category": "prop",
+    "confidence": 0.75,
+    "description": "벽면 공간으로, 그림, 거울, 벽 선반 등이 어울립니다. 갤러리 월을 구성하기에도 적합한 공간입니다.",
+    "gemini_recommendations": [
+      "추상화 그림",
+      "원형 거울",
+      "미니멀 벽 선반"
+    ]
+  },
+  "background_mood": {
+    "primary_style": "white_wood",
+    "category": "Natural & Cozy",
+    "confidence": 0.762179434299469,
+    "warmth_score": 0.5110496378209429,
+    "dominant_colors": [
+      "#d5cfd1",
+      "#bdb1ad"
+    ]
+  },
+  "recommended_products": [
+    {
+      "product_id": "prop_0136",
+      "name": "헤이홈 \"자취/집들이 선물\" 헤이홈 스마트 푸시봇 자동 스위치 핑거봇 스위치봇 원격제어 조명 점등",
+      "category": "prop",
+      "price": 37900,
+      "image_url": "https://img1.kakaocdn.net/thumb/C320x320@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20240603181354_530653ccb5d64127827d9fdb7da7621a.jpg",
+      "match_score": 0.5738612023468138,
+      "match_details": {
+        "color_similarity": 0.9917356724326165,
+        "physics_similarity": 0.8217948831196293,
+        "style_similarity": 0.9893498954774722,
+        "keyword_match_score": 0.0,
+        "original_mood_score": 0.9564353372446898
+      }
+    }
+  ]
+}

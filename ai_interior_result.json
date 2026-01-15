@@ -1,0 +1,71 @@
+{
+  "success": true,
+  "message": "처리 완료 (3개 상품 추천, 3909ms)",
+  "circle_info": {
+    "center_x": 310,
+    "center_y": 212,
+    "radius": 116,
+    "category": "prop",
+    "confidence": 0.75,
+    "description": "이 영역은 소품이나 작은 가구가 들어갈 공간입니다.",
+    "gemini_recommendations": [
+      "사이드 테이블",
+      "스탠드 조명",
+      "화분"
+    ]
+  },
+  "background_mood": {
+    "primary_style": "white_wood",
+    "category": "Natural & Cozy",
+    "confidence": 0.6073404550552368,
+    "warmth_score": 0.5123681337521612,
+    "dominant_colors": [
+      "#d9d3d5",
+      "#a5948d"
+    ]
+  },
+  "recommended_products": [
+    {
+      "product_id": "prop_002",
+      "name": "미니멀 스탠드 조명",
+      "category": "lighting",
+      "price": 65000,
+      "image_url": "https://example.com/lamp1.jpg",
+      "match_score": 0.9454171360002442,
+      "match_details": {
+        "color_similarity": 0.9203057616740405,
+        "physics_similarity": 0.9995501367681983,
+        "style_similarity": 0.9371466695056263
+      },
+      "simulated_image_base64": "<base64 데이터 (309044 chars)>"
+    },
+    {
+      "product_id": "prop_003",
+      "name": "패브릭 쿠션 세트 (베이지)",
+      "category": "textile",
+      "price": 45000,
+      "image_url": "https://example.com/cushion1.jpg",
+      "match_score": 0.8773797011337943,
+      "match_details": {
+        "color_similarity": 0.9120386403850138,
+        "physics_similarity": 0.9876871121272316,
+        "style_similarity": 0.8215138520219899
+      },
+      "simulated_image_base64": "<base64 데이터 (308988 chars)>"
+    },
+    {
+      "product_id": "prop_001",
+      "name": "우드 사이드 테이블",
+      "category": "decor",
+      "price": 85000,
+      "image_url": "https://example.com/table1.jpg",
+      "match_score": 0.7332078981726515,
+      "match_details": {
+        "color_similarity": 0.919931832254485,
+        "physics_similarity": 0.9977390780298752,
+        "style_similarity": 0.5521402263691914
+      },
+      "simulated_image_base64": "<base64 데이터 (308976 chars)>"
+    }
+  ]
+}

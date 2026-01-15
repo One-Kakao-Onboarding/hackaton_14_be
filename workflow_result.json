@@ -1,0 +1,63 @@
+{
+  "circle_detected": true,
+  "circle_info": {
+    "center_x": 310,
+    "center_y": 212,
+    "radius": 116,
+    "category": "prop",
+    "confidence": 0.75,
+    "description": "이 영역은 소품이나 작은 가구가 들어갈 공간입니다.",
+    "gemini_recommendations": [
+      "사이드 테이블",
+      "스탠드 조명",
+      "화분"
+    ]
+  },
+  "background_mood": {
+    "primary_style": "white_wood",
+    "category": "Natural & Cozy",
+    "warmth_score": 0.5108915218605486,
+    "dominant_colors": [
+      "#d9d4d5",
+      "#c1b5b2"
+    ]
+  },
+  "recommended_products": [
+    {
+      "product_id": "prop_002",
+      "name": "미니멀 스탠드 조명",
+      "category": "lighting",
+      "price": 65000,
+      "match_score": 0.9541715252146721,
+      "match_details": {
+        "color_similarity": 0.9175554578729838,
+        "physics_similarity": 0.99661008905149,
+        "style_similarity": 0.9553829871565966
+      }
+    },
+    {
+      "product_id": "prop_003",
+      "name": "패브릭 쿠션 세트 (베이지)",
+      "category": "textile",
+      "price": 45000,
+      "match_score": 0.8678423899112212,
+      "match_details": {
+        "color_similarity": 0.9091244407034103,
+        "physics_similarity": 0.9797004661049562,
+        "style_similarity": 0.8084021572988679
+      }
+    },
+    {
+      "product_id": "prop_001",
+      "name": "우드 사이드 테이블",
+      "category": "decor",
+      "price": 85000,
+      "match_score": 0.731133563709121,
+      "match_details": {
+        "color_similarity": 0.9171557364224779,
+        "physics_similarity": 0.9938705430106747,
+        "style_similarity": 0.5510373109115754
+      }
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # ===== PostgreSQL + pgvector =====
+  db:
+    image: ankane/pgvector:latest
+    container_name: mood-matching-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mood_matching
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mood-matching-network
+
+  # ===== Redis =====
+  redis:
+    image: redis:7-alpine
+    container_name: mood-matching-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - mood-matching-network
+
+  # ===== FastAPI Application =====
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: application
+    container_name: mood-matching-app
+    environment:
+      - DEBUG=true
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=mood_matching
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DEVICE=cpu
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - mood-matching-network
+    restart: unless-stopped
+
+  # ===== Development (선택사항) =====
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: mood-matching-app-dev
+    environment:
+      - DEBUG=true
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=mood_matching
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DEVICE=cpu
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./app:/app/app
+      - ./tests:/app/tests
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - mood-matching-network
+    profiles:
+      - dev
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  mood-matching-network:
+    driver: bridge
