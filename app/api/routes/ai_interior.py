@@ -313,7 +313,7 @@ def _simulate_product_in_room(
             prompt = f"""You are an expert CGI artist and photo-realistic compositor specializing in seamless product integration for interior design visualization.
 
 MISSION:
-Create a hyper-realistic composite where the product appears to have been naturally photographed in the original scene. The result must be indistinguishable from a real photograph.
+Add a single product to the existing room photograph. This is an OBJECT INSERTION task, NOT a scene generation task.
 
 INPUTS:
 1. BASE IMAGE: Original interior room photograph
@@ -321,6 +321,15 @@ INPUTS:
 3. PRODUCT NAME: "{product_name}"
 4. TARGET LOCATION: Approximately ({rel_x:.1f}%, {rel_y:.1f}%) - {location_desc} area
 {thumbnail_instruction}
+
+⚠️ CRITICAL RULE #1: PRESERVE 100% OF THE ORIGINAL BACKGROUND ⚠️
+- DO NOT modify, replace, or regenerate ANY part of the original room
+- DO NOT create new walls, floors, ceilings, or backgrounds
+- DO NOT change the room's architecture, windows, doors, or furniture
+- ONLY ADD the product to the existing scene
+- Think of this as "inpainting" or "object insertion" - the background must remain pixel-perfect identical
+- If the target area shows a window, place product near/on the window frame - DO NOT replace the window with a wall
+- If the target area shows existing furniture, place product on/near it - DO NOT remove or modify the furniture
 
 CRITICAL REALISM REQUIREMENTS:
 
@@ -355,26 +364,31 @@ CRITICAL REALISM REQUIREMENTS:
    - **Atmospheric haze**: Add slight haze if present in original photo
    - **Edge softness**: Avoid hard cutout edges - blend naturally
 
-5. [PLACEMENT LOGIC]
+5. [PLACEMENT LOGIC - PRESERVE EXISTING SCENE]
    Product type: "{product_name}"
-   - Wall-mounted items (switches, frames, clocks, shelves): Place ON THE WALL at appropriate height
-   - Floor items (furniture, plants): Place ON THE FLOOR with proper contact
-   - Table items (decor, small objects): Place ON FURNITURE SURFACE
+   - FIRST: Identify what's ALREADY in the target location (wall? window? furniture? door?)
+   - SECOND: Place product in a way that makes sense with what's already there
+   - Wall-mounted items: Place ON THE EXISTING WALL - do not create a new wall
+   - Floor items: Place ON THE EXISTING FLOOR - do not modify floor texture
+   - Table items: Place ON EXISTING FURNITURE - do not replace furniture
    - **CRITICAL**: If reference thumbnail is provided, observe how the product is positioned in its original context
      * Is it photographed from above/below/straight-on? Match that viewing angle
      * Is it on a surface or mounted? Use that as guidance
      * What's the distance/scale in the reference? Match proportionally
-   - Consider room function and product purpose for natural positioning
+   - If target area has a window: Place product near the window (on window frame or adjacent wall), DO NOT cover or replace the window
+   - If target area is empty space: Add product naturally without changing the background
 
 6. [FINAL QUALITY CHECK]
-   - No floating objects - ensure proper surface contact
+   - ⚠️ MOST IMPORTANT: Original room background is 100% preserved (no new walls/floors/ceilings)
+   - Product appears naturally added to the scene (not replacing scene elements)
+   - No floating objects - ensure proper surface contact with EXISTING surfaces
    - No artificial-looking edges or halos
    - Shadows point in same direction as other objects in room
    - Product appears to be affected by same light as the room
-   - Overall composition looks like a single photograph, not a composite
+   - Overall composition looks like product was naturally placed in room during original photo
 
 OUTPUT REQUIREMENT:
-A completely natural, photorealistic image where the product integration is seamless and undetectable. The viewer should believe this is an original photograph, not an edited composite."""
+Return the original room photograph WITH THE PRODUCT ADDED. The background must be identical to the input image. Only the product should be new. The viewer should see the exact same room with one new item added naturally."""
 
             print(f"   🎨 Gemini 이미지 편집 중: {product_name}")
 
