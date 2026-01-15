@@ -25,6 +25,113 @@ import re
 router = APIRouter()
 
 
+def infer_product_placement_type(product_name: str) -> str:
+    """
+    상품명으로부터 배치 유형을 추론
+
+    Args:
+        product_name: 상품명
+
+    Returns:
+        "wall": 벽걸이/벽부착 상품
+        "floor": 바닥에 놓는 상품
+        "table": 테이블/가구 위에 올리는 상품
+        "any": 어디에나 가능
+    """
+    name_lower = product_name.lower()
+
+    # 벽걸이 키워드
+    wall_keywords = [
+        '벽걸이', '벽시계', '액자', '그림', '거울', '미러', '벽선반', '벽 선반',
+        '스위치', '벽등', '벽조명', '월', 'wall', '벽부착', '벽면',
+        '벽걸이형', '월클락', '월미러', '월선반'
+    ]
+
+    # 바닥 가구 키워드
+    floor_keywords = [
+        '책장', '옷장', '수납장', '책상', '테이블', '의자', '소파', '침대',
+        '서랍장', '행거', '옷걸이', '선반장', '캐비닛', '콘솔', '화분대',
+        '스탠드', '조명스탠드', '장롱', '붙박이', '수납박스', '바구니',
+        '가구', 'furniture', '3단', '4단', '5단', '다단', '다용도수납'
+    ]
+
+    # 탁상 소품 키워드
+    table_keywords = [
+        '탁상', '데스크', '미니', '소형', '컵', '홀더', '정리함', '펜꽂이',
+        '시계', '액자', '화분', '캔들', '향초', '디퓨저', '소품', '장식',
+        '오브제', '피규어', '인형', '쿠션', '쿠션커버'
+    ]
+
+    # 우선순위: 벽걸이 > 바닥 > 탁상
+    for keyword in wall_keywords:
+        if keyword in name_lower:
+            return "wall"
+
+    for keyword in floor_keywords:
+        if keyword in name_lower:
+            return "floor"
+
+    for keyword in table_keywords:
+        if keyword in name_lower:
+            return "table"
+
+    return "any"
+
+
+def calculate_spatial_suitability_score(
+    placement_surface: str,
+    product_placement_type: str
+) -> float:
+    """
+    공간 적합성 점수 계산
+
+    Args:
+        placement_surface: Gemini가 분석한 공간 유형 ("wall", "floor", "ceiling", "furniture_surface")
+        product_placement_type: 상품 배치 유형 ("wall", "floor", "table", "any")
+
+    Returns:
+        0.0 ~ 1.0 점수 (1.0 = 완벽히 적합, 0.0 = 전혀 부적합)
+    """
+    # 완벽한 매칭
+    perfect_match = {
+        ("wall", "wall"): 1.0,
+        ("floor", "floor"): 1.0,
+        ("furniture_surface", "table"): 1.0,
+    }
+
+    # 적절한 매칭
+    good_match = {
+        ("floor", "table"): 0.7,  # 바닥에 탁상 소품도 괜찮음 (작은 가구처럼)
+        ("furniture_surface", "any"): 0.8,
+    }
+
+    # 부적합한 매칭
+    poor_match = {
+        ("wall", "floor"): 0.1,  # 벽면에 바닥 가구 = 매우 부적합
+        ("wall", "table"): 0.3,  # 벽면에 탁상 소품 = 부적합 (벽선반이 아닌 이상)
+        ("floor", "wall"): 0.2,  # 바닥에 벽걸이 = 매우 부적합
+        ("ceiling", "floor"): 0.0,  # 천장에 바닥 가구 = 불가능
+        ("ceiling", "wall"): 0.0,  # 천장에 벽걸이 = 불가능
+    }
+
+    # any는 어디에나 가능
+    if product_placement_type == "any":
+        return 0.8
+
+    # 매칭 테이블에서 점수 찾기
+    key = (placement_surface, product_placement_type)
+
+    if key in perfect_match:
+        return perfect_match[key]
+    elif key in good_match:
+        return good_match[key]
+    elif key in poor_match:
+        return poor_match[key]
+    else:
+        # 정의되지 않은 조합은 중립
+        return 0.5
+
+
 def calculate_keyword_match_score(product_name: str, gemini_keywords: List[str]) -> float:
     """
     상품 이름과 Gemini 추천 키워드 간의 매칭 점수 계산
@@ -516,9 +623,12 @@ async def generate_ai_interior(
             method='weighted'
         )
 
-        # 10. Gemini 추천 키워드 기반 재순위화
+        # 10. Gemini 추천 키워드 + 공간 적합성 기반 재순위화
         gemini_keywords = gemini_result.get('recommendations', [])
+        placement_surface = gemini_result.get('placement_surface', 'floor')  # 공간 유형
+
         print(f"🔍 Gemini 키워드 매칭 중... (키워드: {gemini_keywords})")
+        print(f"📍 공간 유형: {placement_surface}")
 
         for product in ranked_products:
             # 키워드 매칭 점수 계산
@@ -527,17 +637,27 @@ async def generate_ai_interior(
                 gemini_keywords=gemini_keywords
             )
 
-            # 무드 점수와 키워드 점수 결합 (무드 60%, 키워드 40%)
+            # 공간 적합성 점수 계산
+            product_placement_type = infer_product_placement_type(product['name'])
+            spatial_score = calculate_spatial_suitability_score(
+                placement_surface=placement_surface,
+                product_placement_type=product_placement_type
+            )
+
+            # 무드 점수 + 키워드 점수 + 공간 적합성 점수 결합
+            # (무드 50%, 키워드 10%, 공간적합성 40%)
             mood_score = product['match_score']
-            combined_score = mood_score * 0.6 + keyword_score * 0.4
+            combined_score = mood_score * 0.5 + keyword_score * 0.1 + spatial_score * 0.4
 
             # 점수 업데이트
             product['keyword_match_score'] = keyword_score
+            product['spatial_suitability_score'] = spatial_score
+            product['product_placement_type'] = product_placement_type
             product['original_mood_score'] = mood_score
             product['match_score'] = combined_score
 
             print(f"   {product['name'][:50]}")
-            print(f"      무드: {mood_score:.3f} | 키워드: {keyword_score:.3f} | 최종: {combined_score:.3f}")
+            print(f"      무드: {mood_score:.3f} | 키워드: {keyword_score:.3f} | 공간: {spatial_score:.3f} ({product_placement_type}) | 최종: {combined_score:.3f}")
 
         # 최종 점수로 재정렬
         ranked_products.sort(key=lambda x: x['match_score'], reverse=True)
@@ -560,9 +680,11 @@ async def generate_ai_interior(
                 product_thumbnail_url=product.get('image_url', '')
             )
 
-            # match_details에 키워드 점수 추가
+            # match_details에 모든 점수 추가
             match_details = product['match_details'].copy()
             match_details['keyword_match_score'] = product['keyword_match_score']
+            match_details['spatial_suitability_score'] = product['spatial_suitability_score']
+            match_details['product_placement_type'] = product['product_placement_type']
             match_details['original_mood_score'] = product['original_mood_score']
 
             recommended_products_with_simulation.append({
@@ -591,7 +713,8 @@ async def generate_ai_interior(
                 'category': gemini_result['category'],
                 'confidence': gemini_result['confidence'],
                 'description': gemini_result['description'],
-                'gemini_recommendations': gemini_result['recommendations']
+                'gemini_recommendations': gemini_result['recommendations'],
+                'placement_surface': gemini_result.get('placement_surface', 'floor')
             },
             background_mood={
                 'primary_style': bg_style['primary_keyword'],

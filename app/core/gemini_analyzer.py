@@ -74,13 +74,24 @@ class GeminiAnalyzer:
 2. 이것은 '가구(furniture)' 카테고리인가요, 아니면 '인테리어 소품(prop)' 카테고리인가요?
 3. 확신도는 얼마나 되나요? (0.0~1.0)
 4. 이 공간에 어울리는 구체적인 아이템 3개를 추천해주세요.
+5. **중요**: 이 영역의 표면 유형은 무엇인가요? 정확히 분석해주세요:
+   - "wall": 벽면 (그림, 시계, 스위치, 벽걸이 선반 등이 부착되는 수직면)
+   - "floor": 바닥 (책장, 테이블, 의자, 화분 등이 놓이는 수평면)
+   - "ceiling": 천장 (조명, 선풍기 등이 부착되는 상부 수평면)
+   - "furniture_surface": 가구 표면 (테이블 위, 선반 위 등 기존 가구 위)
+
+   판단 기준:
+   - 벽면: 벽의 질감, 벽지, 페인트가 보이는 수직 공간
+   - 바닥: 바닥재(나무, 타일 등)가 보이거나 바닥에 가구를 놓을 수 있는 공간
+   - 가구 표면: 이미 책상, 선반, 수납장 등 가구가 있고 그 위에 소품을 올릴 수 있는 공간
 
 응답 형식:
 {
   "category": "furniture" or "prop",
   "confidence": 0.85,
   "description": "침대 옆 공간으로, 사이드 테이블이나 스탠드 조명이 적합합니다.",
-  "recommendations": ["우드 사이드 테이블", "미니멀 스탠드 조명", "작은 화분"]
+  "recommendations": ["우드 사이드 테이블", "미니멀 스탠드 조명", "작은 화분"],
+  "placement_surface": "floor" or "wall" or "ceiling" or "furniture_surface"
 }
 """
 
@@ -115,6 +126,13 @@ class GeminiAnalyzer:
         # 이미지 크기 기반 간단한 휴리스틱
         height, width = region_image.shape[:2]
         area = height * width
+        aspect_ratio = width / height if height > 0 else 1.0
+
+        # placement_surface 판단 (세로로 긴 영역은 벽일 가능성)
+        if aspect_ratio < 0.8:  # 세로로 긴 영역
+            placement_surface = "wall"
+        else:
+            placement_surface = "floor"
 
         # 큰 영역이면 가구, 작은 영역이면 소품으로 판단
         if area > 100000:  # 대략 300x300 이상
@@ -130,5 +148,6 @@ class GeminiAnalyzer:
             'category': category,
             'confidence': 0.75,
             'description': description,
-            'recommendations': recommendations[:3]
+            'recommendations': recommendations[:3],
+            'placement_surface': placement_surface
         }

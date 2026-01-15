@@ -1,49 +1,52 @@
 {
   "success": true,
-  "message": "처리 완료 (1개 상품 추천, 18593ms)",
-  "total_time_ms": 18627.71725654602,
+  "message": "처리 완료 (1개 상품 추천, 17238ms)",
+  "total_time_ms": 17260.430097579956,
   "test_circle": {
-    "x": 0.3,
-    "y": 0.7,
+    "x": 0.5,
+    "y": 0.25,
     "radius": 0.1
   },
   "circle_info": {
-    "center_x": 270,
-    "center_y": 186,
+    "center_x": 450,
+    "center_y": 466,
     "radius": 90,
-    "category": "prop",
-    "confidence": 0.75,
-    "description": "벽면 공간으로, 그림, 거울, 벽 선반 등이 어울립니다. 갤러리 월을 구성하기에도 적합한 공간입니다.",
+    "category": "furniture",
+    "confidence": 0.9,
+    "description": "바닥 공간으로, 책장 앞에 놓을 러그가 적합합니다. 또는, 작은 테이블이나 의자를 놓아 공간 활용도를 높일 수 있습니다.",
     "gemini_recommendations": [
-      "추상화 그림",
-      "원형 거울",
-      "미니멀 벽 선반"
-    ]
+      "원형 러그",
+      "작은 티 테이블",
+      "등받이 없는 스툴"
+    ],
+    "placement_surface": "floor"
   },
   "background_mood": {
     "primary_style": "white_wood",
     "category": "Natural & Cozy",
-    "confidence": 0.762179434299469,
-    "warmth_score": 0.5110496378209429,
+    "confidence": 0.8828874826431274,
+    "warmth_score": 0.5111991083210324,
     "dominant_colors": [
-      "#d5cfd1",
-      "#bdb1ad"
+      "#d6d1d2",
+      "#beb2ae"
     ]
   },
   "recommended_products": [
     {
-      "product_id": "prop_0136",
-      "name": "헤이홈 \"자취/집들이 선물\" 헤이홈 스마트 푸시봇 자동 스위치 핑거봇 스위치봇 원격제어 조명 점등",
-      "category": "prop",
-      "price": 37900,
-      "image_url": "https://img1.kakaocdn.net/thumb/C320x320@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20240603181354_530653ccb5d64127827d9fdb7da7621a.jpg",
-      "match_score": 0.5738612023468138,
+      "product_id": "furniture_0046",
+      "name": "룸앤홈(가구) 다용도 렌지대 진열장 5단",
+      "category": "furniture",
+      "price": 67900,
+      "image_url": "https://img1.kakaocdn.net/thumb/C320x320@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20200403165458_b4e6331bc719429bb2d3b6e6a26d2e79",
+      "match_score": 0.8185902668439665,
       "match_details": {
-        "color_similarity": 0.9917356724326165,
-        "physics_similarity": 0.8217948831196293,
-        "style_similarity": 0.9893498954774722,
+        "color_similarity": 0.9991856427433174,
+        "physics_similarity": 0.8184367858467072,
+        "style_similarity": 0.7703577560595675,
         "keyword_match_score": 0.0,
-        "original_mood_score": 0.9564353372446898
+        "spatial_suitability_score": 1.0,
+        "product_placement_type": "floor",
+        "original_mood_score": 0.837180533687933
       }
     }
   ]

@@ -17,10 +17,10 @@ API_URL = "http://localhost:8000/api/ai-interior"
 # 테스트 이미지
 TEST_IMAGE = "test_image1.jpeg"
 
-# 테스트할 좌표
+# 테스트할 좌표 (바닥 중앙 영역)
 TEST_CIRCLE = {
-    "x": 0.3,
-    "y": 0.7,
+    "x": 0.5,
+    "y": 0.25,
     "radius": 0.1
 }
 
